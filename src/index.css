@@ -1,0 +1,110 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #08090c;
+  --surface: #0f1117;
+  --surface2: #161822;
+  --surface3: #1d2030;
+  --border: #ffffff12;
+  --border2: #ffffff20;
+  --orange: #ff5c1a;
+  --orange2: #ff8144;
+  --orange-glow: #ff5c1a44;
+  --text: #f0f2ff;
+  --text2: #9ca3c9;
+  --text3: #5a6080;
+  --green: #22d87a;
+  --red: #ff4f6a;
+  --blue: #4f9eff;
+  --gold: #ffd166;
+  font-family: 'DM Sans', sans-serif;
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  text-align: left;
+}
+
+/* Noise overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.6;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 2px; }
+
+/* Animations */
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes toast-in { from { opacity: 0; transform: translateX(30px) scale(0.95); } to { opacity: 1; transform: none; } }
+@keyframes slide-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+.spin  { display: inline-block; animation: spin 0.7s linear infinite; }
+.float { animation: float 4s ease-in-out infinite; }
+.pulse { animation: pulse 1.5s infinite; }
+.slide-up { animation: slide-up 0.35s ease both; }
+
+/* Card hover */
+.sale-card {
+  transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
+  cursor: pointer;
+}
+.sale-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  border-color: var(--border2) !important;
+}
+
+/* Nav link hover */
+.nav-link {
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+}
+.nav-link:hover {
+  background: var(--surface2) !important;
+  color: var(--text) !important;
+}
+
+/* Orange button */
+.btn-orange {
+  transition: filter 0.15s, transform 0.1s, box-shadow 0.15s;
+  cursor: pointer;
+}
+.btn-orange:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px var(--orange-glow);
+}
+.btn-orange:active { transform: scale(0.97); }
+
+/* Input focus */
+.form-input:focus {
+  border-color: var(--orange) !important;
+  outline: none;
+}
