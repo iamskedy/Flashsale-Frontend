@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { authApi } from '../api/auth.api'
 import { useAuthStore } from '../store/auth.store'
 import { getSocket } from '../socket/socket'
@@ -28,30 +28,37 @@ const labelStyle = {
 }
 
 export default function LoginPage() {
-  const [mode, setMode] = useState('login')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [mode, setMode]       = useState('login')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError]     = useState('')
 
-  const login = useAuthStore((s) => s.login)
+  const emailRef    = useRef()
+  const passwordRef = useRef()
+
+  const login    = useAuthStore((s) => s.login)
   const navigate = useNavigate()
 
   const submit = async () => {
-    if (!email.trim() || !password.trim()) {
+    const email    = emailRef.current?.value?.trim()
+    const password = passwordRef.current?.value?.trim()
+
+    if (!email || !password) {
       setError('Please fill in all fields.')
       return
     }
+
     setLoading(true)
     setError('')
+
     try {
       const data =
         mode === 'login'
           ? await authApi.login(email, password)
           : await authApi.register(email, password)
+
       login(data.token, data.user.id, data.user.role)
-      getSocket() // init WebSocket right after login
-      navigate('/')
+      getSocket()
+      navigate(data.user.role === 'admin' ? '/admin' : '/')
     } catch (err) {
       setError(err.response?.data?.message || 'Authentication failed. Check your credentials.')
     } finally {
@@ -61,7 +68,7 @@ export default function LoginPage() {
 
   return (
     <div style={{
-      minHeight: 'calc(100vh - 98px)',
+      minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -86,7 +93,10 @@ export default function LoginPage() {
         }} />
 
         <div style={{ fontSize: 40, marginBottom: 12, textAlign: 'center' }}>⚡</div>
-        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 36, letterSpacing: 2, color: 'var(--text)', marginBottom: 8 }}>
+        <div style={{
+          fontFamily: "'Bebas Neue',sans-serif", fontSize: 36,
+          letterSpacing: 2, color: 'var(--text)', marginBottom: 8,
+        }}>
           {mode === 'login' ? 'Welcome Back' : 'Join FlashSale'}
         </div>
         <div style={{ fontSize: 14, color: 'var(--text2)', marginBottom: 32 }}>
@@ -95,13 +105,9 @@ export default function LoginPage() {
 
         {error && (
           <div style={{
-            background: '#ff4f6a18',
-            border: '1px solid #ff4f6a44',
-            color: 'var(--red)',
-            borderRadius: 10,
-            padding: '10px 16px',
-            marginBottom: 20,
-            fontSize: 13,
+            background: '#ff4f6a18', border: '1px solid #ff4f6a44',
+            color: 'var(--red)', borderRadius: 10,
+            padding: '10px 16px', marginBottom: 20, fontSize: 13,
           }}>
             {error}
           </div>
@@ -110,24 +116,26 @@ export default function LoginPage() {
         <div style={{ marginBottom: 20 }}>
           <label style={labelStyle}>Email</label>
           <input
+            ref={emailRef}
             className="form-input"
             style={inputStyle}
             type="email"
             placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            defaultValue=""
           />
         </div>
 
         <div style={{ marginBottom: 28 }}>
           <label style={labelStyle}>Password</label>
           <input
+            ref={passwordRef}
             className="form-input"
             style={inputStyle}
             type="password"
             placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            defaultValue=""
             onKeyDown={(e) => e.key === 'Enter' && submit()}
           />
         </div>
@@ -137,20 +145,12 @@ export default function LoginPage() {
           onClick={submit}
           disabled={loading}
           style={{
-            width: '100%',
-            background: 'var(--orange)',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 10,
-            padding: 14,
-            fontSize: 15,
-            fontWeight: 700,
+            width: '100%', background: 'var(--orange)', color: '#fff',
+            border: 'none', borderRadius: 10, padding: 14,
+            fontSize: 15, fontWeight: 700,
             cursor: loading ? 'wait' : 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            fontFamily: "'DM Sans',sans-serif",
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 8, fontFamily: "'DM Sans',sans-serif",
           }}
         >
           {loading

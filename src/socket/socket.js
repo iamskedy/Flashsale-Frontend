@@ -6,7 +6,7 @@ let socket = null
 export function getSocket() {
   if (!socket) {
     const token = useAuthStore.getState().token
-    const wsUrl = import.meta.env.VITE_WS_URL || 'http://localhost:3000'
+    const wsUrl = import.meta.env.VITE_WS_URL || window.location.origin
 
     socket = io(wsUrl, {
       auth: { token: token ? `Bearer ${token}` : '' },

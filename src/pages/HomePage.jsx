@@ -12,6 +12,7 @@ export default function HomePage() {
     staleTime: 30_000,
     retry: 1,
   })
+  console.log('sales data:', sales)
 
   const activeSales = sales?.filter((s) => s.status === 'active') ?? []
 
